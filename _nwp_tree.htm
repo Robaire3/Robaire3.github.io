@@ -1,0 +1,108 @@
+<html>
+<head>
+<title>Nyf2Web Tree Page</title>
+	<style>
+	.tabContainer {
+		background-color: #f0f0f0;
+		border: 1px solid silver;
+		margin: 0px;
+		padding: 5px;
+		overflow: auto;
+		display: block;
+	}
+	</style>
+
+<!-- tree files linked here, standard version of Tigra Tree Menu PRO is used -->
+<script language="JavaScript" src="nyf2web.js"></script>
+<script language="JavaScript" src="tree_items.js"></script>
+<link rel="stylesheet" href="nyf2web.css">
+
+<!-- functions that how/hide the panel -->
+<script language="JavaScript">
+var s_userAgent = navigator.userAgent.toLowerCase();
+var b_ie5    = s_userAgent.indexOf('msie 5') != -1;
+var b_ie6    = s_userAgent.indexOf('msie 6') != -1 && s_userAgent.indexOf('opera') == -1;
+var n_offsetAdjust = b_ie5 || b_ie6 ? 1 : 25;
+	
+// get references of the elements
+getElement = document.all ?
+	function (s_id) { return document.all[s_id] } :
+	function (s_id) { return document.getElementById(s_id) };
+
+function openItemByCaption(s_caption, o_tree) {
+	// set to true when debugging the application
+	var B_DEBUG = true;
+
+	// exit if required parameter isn't specified
+	if (!s_caption)
+		return (B_DEBUG
+			? alert("Required parameter to function openItemByCaption is missing")
+			: false
+		);
+
+	// use first tree on the page if tree object isn't explicitly defined
+	if (!o_tree)
+		o_tree = (TREES[0]);
+	if (!o_tree)
+		return (B_DEBUG
+			? alert("No Tigra Tree Menu PRO instances can be found on this page")
+			: false
+		);
+
+    // find item with specified caption
+    var a_item = o_tree.find_item(s_caption);
+    for(var n=0; n < a_item.length; n++) {
+    	o_item=a_item[n];
+    	try	{ o_item.mover(); }	catch(e) { }
+	// collect info about all item's parents
+	var n_id = o_item.n_id,
+		n_depth = o_item.n_depth,
+		a_index = o_item.o_root.a_index,
+		a_parents = [o_item];
+
+	while (n_depth) {
+		if (a_index[n_id].n_depth < n_depth) {
+			a_parents[a_parents.length] = a_index[n_id];
+			n_depth--;
+		}
+		n_id--;
+	}
+		
+	// open all parents starting from root
+	for (var i = a_parents.length-1; i >= 0; i--)
+	   // check if node or root
+	   if (a_parents[i].n_state & 48)
+	      a_parents[i].open();
+	   else
+	   	  a_parents[i].select();
+    }
+}
+		
+</script>
+<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1"><style type="text/css">
+<!--
+body {
+	background-color: #009966;
+}
+-->
+</style></head>
+
+<body>
+	<div class="tabContainer" style="FONT-SIZE:12px">
+<table width="95%" border="0" cellspacing=0 cellpadding=0 style="FONT-SIZE:12px"><tr>
+	<td>Search text(* for all)</td>
+	<td width="20" align="right"><font face="Webdings">
+		<span title="Start search" onClick="return TTMS_search(livesearch1, ttmp1)">s</span><span 
+			onclick="tree_live_search_result.style.display='none'" title="Hide search result">r</span>
+	</font></td></tr>
+	<tr><td colspan=2><input type="text" name="livesearch1" title="type * to list all items, Press ENTER to start" 
+		style="WIDTH:100%" onKeyUp=" return TTMS_search(this, ttmp1)">
+	</td></tr></table>
+	<div id="tree_live_search_result"></div>
+	<hr size="1">
+	<script language="JavaScript">
+		var ttmp1 = new tree (TREE_ITEMS, tree_tpl);
+	</script>
+	</div>
+</body>
+</html>
